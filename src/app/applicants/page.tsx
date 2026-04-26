@@ -10,6 +10,8 @@ import { Button, Input, Select, Space, Table, Tag, Typography } from "antd";
 import { AppShell } from "@/components/app-shell";
 import { APPLICANT_STATUSES, type Applicant } from "@/types/applicant";
 
+const PAGE_SIZE_OPTIONS = ["1", "2", "3"];
+
 export default function ApplicantsListPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>();
@@ -31,7 +33,7 @@ export default function ApplicantsListPage() {
     syncWithLocation: true,
     filters: { permanent: filters },
     sorters: { initial: [{ field: "createdAt", order: "desc" }] },
-    pagination: { pageSize: 10 },
+    pagination: { pageSize: 1 },
   });
 
   return (
@@ -61,6 +63,11 @@ export default function ApplicantsListPage() {
         <Table
           {...tableProps}
           rowKey="id"
+          pagination={{
+            ...tableProps.pagination,
+            showSizeChanger: true,
+            pageSizeOptions: PAGE_SIZE_OPTIONS,
+          }}
         >
           <Table.Column<Applicant> dataIndex="fullName" title="Name" />
           <Table.Column<Applicant> dataIndex="email" title="Email" />

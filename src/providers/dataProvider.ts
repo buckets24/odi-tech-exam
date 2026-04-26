@@ -17,6 +17,14 @@ const getPositiveInteger = (value: unknown) => {
   return truncated > 0 ? truncated : undefined;
 };
 
+const normalizeSortOrder = (order: unknown): "asc" | "desc" | undefined => {
+  if (typeof order !== "string") return undefined;
+  const normalized = order.trim().toLowerCase();
+  if (["desc", "descend", "descending"].includes(normalized)) return "desc";
+  if (["asc", "ascend", "ascending"].includes(normalized)) return "asc";
+  return undefined;
+};
+
 const buildQuery = (
   pagination?: PaginationLike,
   filters?: CrudFilters,
@@ -31,9 +39,10 @@ const buildQuery = (
   if (limit !== undefined) params.set("limit", String(limit));
 
   const firstSorter = sorters?.[0];
-  if (firstSorter?.field && firstSorter.order) {
+  const order = normalizeSortOrder(firstSorter?.order);
+  if (firstSorter?.field && order) {
     params.set("sortBy", String(firstSorter.field));
-    params.set("order", firstSorter.order === "desc" ? "desc" : "asc");
+    params.set("order", order);
   }
 
   filters?.forEach((filter) => {
