@@ -1,9 +1,8 @@
-import type { Hono } from "hono";
 import { createApp } from "../../../../backend/app.js";
 
 export const runtime = "nodejs";
 
-let honoApp: Hono | null = null;
+let honoApp: ReturnType<typeof createApp> | null = null;
 
 const getApp = () => {
   if (!honoApp) {
