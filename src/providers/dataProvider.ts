@@ -3,19 +3,32 @@
 import type { DataProvider, CrudFilters, CrudSorting } from "@refinedev/core";
 import { getResolvedApiBaseUrl, httpClient } from "@/lib/http";
 
+type PaginationLike = {
+  current?: number;
+  currentPage?: number;
+  pageSize?: number;
+  perPage?: number;
+};
+
+const getPositiveInteger = (value: unknown) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return undefined;
+  const truncated = Math.trunc(parsed);
+  return truncated > 0 ? truncated : undefined;
+};
+
 const buildQuery = (
-  pagination?: { current?: number; pageSize?: number },
+  pagination?: PaginationLike,
   filters?: CrudFilters,
   sorters?: CrudSorting,
 ) => {
   const params = new URLSearchParams();
 
-  if (pagination?.current) {
-    params.set("page", String(pagination.current));
-  }
-  if (pagination?.pageSize) {
-    params.set("limit", String(pagination.pageSize));
-  }
+  const page = getPositiveInteger(pagination?.current ?? pagination?.currentPage);
+  const limit = getPositiveInteger(pagination?.pageSize ?? pagination?.perPage);
+
+  if (page !== undefined) params.set("page", String(page));
+  if (limit !== undefined) params.set("limit", String(limit));
 
   const firstSorter = sorters?.[0];
   if (firstSorter?.field && firstSorter.order) {
